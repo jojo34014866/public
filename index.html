@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万图 - 在线工具集</title>
+    <style>
+        /* 基础变量和主题 */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --output-bg: #f8f9fa;
+            --primary-color: #4a90e2;
+            --success-color: #28a745;
+            --hover-color: rgba(74, 144, 226, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --output-bg: #2d2d2d;
+        }
+
+        /* 基础样式 */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 导航栏样式 */
+        .nav-bar {
+            background-color: var(--output-bg);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--hover-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 统一的按钮基础样式 */
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 导航栏按钮组样式 */
+        .right-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* 主题切换按钮 */
+        #themeToggle {
+            background: none;
+            padding: 8px;
+            font-size: 18px;
+            color: var(--text-color);
+        }
+
+        /* 捐款按钮 */
+        .donation-button {
+            background-color: var(--success-color);
+        }
+
+        /* 捐款按钮悬浮效果 */
+        .donation-button:hover {
+            background-color: #218838;
+        }
+
+        /* 功能按钮组样式 */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* 按钮悬浮效果 */
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* 按钮点击效果 */
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* 暗色模式适配 */
+        [data-theme="dark"] button {
+            background-color: #2d2d2d;
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .donation-button {
+            background-color: #2ea44f;
+            border: none;
+        }
+
+        [data-theme="dark"] #themeToggle {
+            background: none;
+            border: none;
+        }
+
+        /* 页面容器 */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin: 20px 0;
+            font-size: 24px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tool-card {
+            background-color: var(--output-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tool-card h2 {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+        }
+
+        .tool-card p {
+            margin: 0 0 15px 0;
+            color: var(--text-color);
+        }
+
+        .tool-card a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4a90e2;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .tool-card a:hover {
+            background-color: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">首页</a>
+            <a href="markdown.htm" class="nav-link">文本清理</a>
+            <a href="html2jpg.html" class="nav-link">HTML转图片</a>
+            <a href="image-tools.html" class="nav-link">图片工具</a>
+        </div>
+        <div class="right-buttons">
+            <button onclick="toggleTheme()" id="themeToggle">🌙</button>
+            <button class="donation-button" onclick="showDonation()">捐款</button>
+        </div>
+    </div>
+
+    <div class="tools-grid">
+        <div class="tool-card">
+            <h2>文本清理工具</h2>
+            <p>清理Markdown格式，提取纯文本内容</p>
+            <a href="markdown.htm">开始使用</a>
+        </div>
+        <div class="tool-card">
+            <h2>HTML转图片</h2>
+            <p>将HTML内容转换为高清图片</p>
+            <a href="html2jpg.html">开始使用</a>
+        </div>
+        <div class="tool-card">
+            <h2>图片工具</h2>
+            <p>图片格式转换、压缩等功能</p>
+            <a href="image-tools.html">开始使用</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.documentElement;
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeButton.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html> 
