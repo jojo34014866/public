@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万图</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* 添加暗黑模式样式 */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --output-bg: #f8f9fa;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --output-bg: #2d2d2d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            background-color: var(--output-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        .output {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+            background-color: var(--output-bg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-color);
+            height: auto;
+            min-height: 200px;
+            max-height: none;
+            overflow-y: visible;
+        }
+        /* 添加滚动条样式 */
+        .output::-webkit-scrollbar {
+            width: 8px;
+        }
+        .output::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .output::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .output::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* 统一的按钮基础样式 */
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #4a90e2;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: #357abd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* 捐款按钮特殊样式 */
+        .donation-button {
+            background-color: #28a745;
+        }
+
+        .donation-button:hover {
+            background-color: #218838;
+        }
+
+        /* 生成图片按钮特殊样式 */
+        button[onclick="generateImage()"] {
+            background-color: #6c757d;
+        }
+
+        button[onclick="generateImage()"]:hover {
+            background-color: #5a6268;
+        }
+
+        /* 复制文本按钮特殊样式 */
+        button[onclick="copyText()"] {
+            background-color: #17a2b8;
+        }
+
+        button[onclick="copyText()"]:hover {
+            background-color: #138496;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: relative;
+            margin: auto;
+            margin-top: 50px;
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .modal-content img {
+            width: 100%;
+            height: auto;
+        }
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        /* 添加一个用于显示的容器，保持滚动功能 */
+        .output-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        /* 添加容器样式 */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* 标题样式调整 */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin: 0;  /* 移除标题默认边距 */
+            flex-grow: 1;  /* 让标题占据中间空间 */
+        }
+        /* 添加预览模态框样式 */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .preview-content {
+            position: relative;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            max-width: 90%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .preview-buttons {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-preview:hover {
+            color: #333;
+        }
+
+        #preview-image {
+            max-width: 100%;
+            height: auto;
+        }
+        /* 修改输入区域容器样式 */
+        .input-section {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);  /* 使用主题变量替换白色 */
+            padding: 20px 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);  /* 使用主题变量替换边框颜色 */
+        }
+
+        /* 调整主体内容区域样式 */
+        .content-section {
+            margin-top: 20px;
+        }
+
+        /* 调整按钮在暗色模式下的样式 */
+        [data-theme="dark"] button {
+            background-color: #2d2d2d;
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] button:hover {
+            background-color: #3d3d3d;
+        }
+
+        /* 保持特殊按钮的颜色 */
+        [data-theme="dark"] .donation-button {
+            background-color: #28a745;
+            border: none;
+        }
+
+        [data-theme="dark"] .donation-button:hover {
+            background-color: #218838;
+        }
+
+        /* 修改模态框在暗色模式下的样式 */
+        [data-theme="dark"] .modal-content,
+        [data-theme="dark"] .preview-content {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* 修改关闭按钮在暗色模式下的颜色 */
+        [data-theme="dark"] .close,
+        [data-theme="dark"] .close-preview {
+            color: var(--text-color);
+        }
+
+        /* 修改标题在暗色模式下的颜色 */
+        [data-theme="dark"] h1 {
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="input-section">
+        <div class="header-container">
+            <div style="width: 100px">
+                <button onclick="toggleTheme()" id="themeToggle">🌙</button>
+            </div>
+            <h1>文本清洗工具</h1>
+            <button class="donation-button" onclick="showDonation()">捐款</button>
+        </div>
+        <!-- 出自calum -->
+        <textarea id="input" placeholder="粘贴 Markdown 文本..."></textarea>
+        <button onclick="cleanMarkdown()">清洗文本</button>
+    </div>
+
+    <div class="content-section">
+        <div class="output-container">
+            <div id="output" class="output"></div>
+        </div>
+        <button onclick="copyText()">复制文本</button>
+        <button onclick="generateImage()">生成图片</button>
+    </div>
+
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDonation()">&times;</span>
+            <img src="https://cdn.jsdelivr.net/gh/jojo34014866/public@main/images/qr-code-image.jpg" alt="QR Code">
+
+        </div>
+    </div>
+
+    <!-- 添加预览模态框 -->
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-content">
+            <span class="close-preview" onclick="closePreview()">&times;</span>
+            <img id="preview-image" alt="预览图片">
+            <div class="preview-buttons">
+                <button onclick="downloadImage()">下载图片</button>
+                <button onclick="closePreview()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cleanMarkdown() {
+            const input = document.getElementById("input").value;
+            let text = input;
+
+            // 增强的文本清理规则
+            text = text
+                // 移除标题
+                .replace(/^#+\s*/gm, "")
+                // 移除粗体和斜体
+                .replace(/[*_]{1,2}(.*?)[*_]{1,2}/g, "$1")
+                // 处理代码块，保留内容
+                .replace(/```[\s\S]*?\n([\s\S]*?)```/g, "代码块:\n$1\n")
+                // 处理行内代码
+                .replace(/`([^`]+)`/g, "$1")
+                // 优化列表处理
+                .replace(/^\s*[-*+]\s+/gm, "• ")
+                .replace(/^\s*\d+\.\s+/gm, "• ")
+                // 移除链接，保留文本
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+                // 移除图片
+                .replace(/!\[.*?\]\(.*?\)/g, "")
+                // 移除HTML标签
+                .replace(/<[^>]+>/g, "")
+                // 处理引用
+                .replace(/^\s*>\s*/gm, "")
+                // 移除多余空行
+                .replace(/\n{3,}/g, "\n\n")
+                // 移除水平分割线
+                .replace(/^-{3,}$|^_{3,}$|^\*{3,}$/gm, "");
+
+            // 显示结果
+            document.getElementById("output").textContent = text.trim();
+        }
+
+        function generateImage() {
+            const output = document.getElementById("output");
+            
+            if (!output.textContent.trim()) {
+                alert("没有可以生成图片的内容！");
+                return;
+            }
+
+            html2canvas(output, {
+                backgroundColor: '#f8f9fa',
+                scale: 2,
+                height: output.scrollHeight,
+                width: output.scrollWidth,
+                windowWidth: output.scrollWidth,
+                windowHeight: output.scrollHeight
+            }).then(canvas => {
+                // 显示预览
+                const previewModal = document.getElementById("previewModal");
+                const previewImage = document.getElementById("preview-image");
+                previewImage.src = canvas.toDataURL("image/png");
+                previewModal.style.display = "block";
+                
+                // 保存 canvas 用于后续下载
+                window.tempCanvas = canvas;
+            });
+        }
+
+        function showDonation() {
+            document.getElementById("donationModal").style.display = "block";
+        }
+
+        function closeDonation() {
+            document.getElementById("donationModal").style.display = "none";
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById("donationModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function copyText() {
+            const output = document.getElementById("output");
+            
+            // 检查是否有内容可复制
+            if (!output.textContent.trim()) {
+                alert("没有可以复制的内容！");
+                return;
+            }
+
+            // 复制文本到剪贴板
+            navigator.clipboard.writeText(output.textContent)
+                .then(() => {
+                    alert("文本已复制到剪贴板！");
+                })
+                .catch(err => {
+                    alert("复制失败，请手动复制。");
+                    console.error('复制失败:', err);
+                });
+        }
+
+        function downloadImage() {
+            if (window.tempCanvas) {
+                const link = document.createElement("a");
+                link.download = "cleaned-text.png";
+                link.href = window.tempCanvas.toDataURL("image/png");
+                link.click();
+                closePreview();
+            }
+        }
+
+        function closePreview() {
+            const previewModal = document.getElementById("previewModal");
+            previewModal.style.display = "none";
+            window.tempCanvas = null;
+        }
+
+        // 点击模态框外部关闭预览
+        window.onclick = function(event) {
+            const previewModal = document.getElementById("previewModal");
+            if (event.target == previewModal) {
+                closePreview();
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeButton.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 页面加载时检查主题
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+            }
+        });
+    </script>
+</body>
+</html>
