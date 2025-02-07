@@ -54,10 +54,56 @@
         .output::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+        /* 统一的按钮基础样式 */
         button {
-            margin-top: 10px;
             padding: 10px 20px;
-            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #4a90e2;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: #357abd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* 捐款按钮特殊样式 */
+        .donation-button {
+            background-color: #28a745;
+        }
+
+        .donation-button:hover {
+            background-color: #218838;
+        }
+
+        /* 生成图片按钮特殊样式 */
+        button[onclick="generateImage()"] {
+            background-color: #6c757d;
+        }
+
+        button[onclick="generateImage()"]:hover {
+            background-color: #5a6268;
+        }
+
+        /* 复制文本按钮特殊样式 */
+        button[onclick="copyText()"] {
+            background-color: #17a2b8;
+        }
+
+        button[onclick="copyText()"]:hover {
+            background-color: #138496;
         }
         .modal {
             display: none;
@@ -94,30 +140,33 @@
             max-height: 600px;
             overflow-y: auto;
         }
-        /* 添加捐款按钮的固定位置样式 */
-        .donation-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 999;
-            background-color: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 8px 15px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        /* 添加容器样式 */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
-        .donation-button:hover {
-            background-color: #e9ecef;
+        /* 标题样式调整 */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin: 0;  /* 移除标题默认边距 */
+            flex-grow: 1;  /* 让标题占据中间空间 */
         }
     </style>
 </head>
 <body>
-    <h1>文本清洗工具</h1>
+    <div class="header-container">
+        <div style="width: 100px"></div>  <!-- 左侧占位 -->
+        <h1>文本清洗工具</h1>
+        <button class="donation-button" onclick="showDonation()">捐款</button>
+    </div>
+    <!-- 出自calum -->
     <textarea id="input" placeholder="粘贴 Markdown 文本..."></textarea>
     <button onclick="cleanMarkdown()">清洗文本</button>
-    <button class="donation-button" onclick="showDonation()">捐款</button>
     <div class="output-container">
         <div id="output" class="output"></div>
     </div>
