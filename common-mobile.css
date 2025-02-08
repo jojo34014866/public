@@ -1,0 +1,162 @@
+/* 移动端适配样式 */
+@media screen and (max-width: 768px) {
+    /* 导航栏适配 */
+    .nav-bar {
+        padding: 10px;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav-links {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 5px;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .nav-link {
+        padding: 6px 12px;
+        white-space: nowrap;
+        font-size: 14px;
+    }
+
+    .right-buttons {
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    /* 通用容器适配 */
+    .container {
+        padding: 10px;
+        margin: 10px;
+        min-width: auto;
+    }
+
+    /* 标题适配 */
+    h1 {
+        font-size: 20px;
+        margin: 10px 0;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    /* 工具卡片适配 (首页) */
+    .tools-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px;
+    }
+
+    .tool-card {
+        padding: 15px;
+    }
+
+    /* 编辑器容器适配 (HTML转图片页面) */
+    .editor-container {
+        gap: 15px;
+    }
+
+    .section-content {
+        padding: 10px;
+    }
+
+    #preview {
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* 按钮组适配 */
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* 图片工具页面适配 */
+    .tool-section {
+        padding: 15px;
+    }
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+
+    .settings label {
+        font-size: 14px;
+    }
+
+    /* 模态框适配 */
+    .modal-content {
+        width: 90%;
+        margin: 30% auto;
+        padding: 15px;
+    }
+
+    .modal-content img {
+        width: 100%;
+        height: auto;
+        max-width: 300px;
+        max-height: 300px;
+    }
+
+    /* 输入框和输出区域适配 */
+    textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .output {
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    /* 预览区域适配 */
+    .preview-content {
+        padding: 10px;
+    }
+
+    #preview-image {
+        max-width: 100%;
+    }
+
+    /* 滚动条优化 */
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    /* 输入输出区域高度优化 */
+    textarea, .output {
+        height: auto;
+        min-height: 150px;
+    }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 320px) {
+    .nav-link {
+        padding: 4px 8px;
+        font-size: 13px;
+    }
+
+    button {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+} 

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML转图片 - 万图</title>
+    <!-- 引入 html2pdf 库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* CSS 变量定义 - 用于主题切换 */
+        :root {
+            --bg-color: #ffffff;          /* 背景色 */
+            --text-color: #333333;        /* 文字颜色 */
+            --border-color: #e0e0e0;      /* 边框颜色 */
+            --output-bg: #f8f9fa;         /* 输出区背景色 */
+            --primary-color: #4a90e2;     /* 主要颜色 */
+            --success-color: #28a745;     /* 成功状态颜色 */
+            --hover-color: rgba(74, 144, 226, 0.1); /* 悬浮状态颜色 */
+        }
+
+        /* 暗色主题变量 */
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --output-bg: #242424;
+            --input-bg: #1e1e1e;
+        }
+
+        /* 基础页面样式 */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* 导航栏样式 */
+        .nav-bar {
+            background-color: var(--output-bg);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;  /* 固定在顶部 */
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* 导航链接容器 */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* 导航链接样式 */
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        /* 导航链接悬浮效果 */
+        .nav-link:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* 当前页面导航链接样式 */
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 右侧按钮组样式 */
+        .right-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* 按钮基础样式 */
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 按钮悬浮效果 */
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        /* 按钮点击效果 */
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* 主题切换按钮样式 */
+        #themeToggle {
+            background: none;
+            padding: 8px;
+            font-size: 18px;
+        }
+
+        /* 捐款按钮样式 */
+        .donation-button {
+            background-color: var(--success-color);
+        }
+
+        /* 捐款按钮悬浮效果 */
+        .donation-button:hover {
+            background-color: #218838;
+        }
+
+        /* 暗色模式按钮样式适配 */
+        [data-theme="dark"] button {
+            background-color: #2d2d2d;
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .donation-button {
+            background-color: #2ea44f;
+            border: none;
+        }
+
+        [data-theme="dark"] #themeToggle {
+            background: none;
+            border: none;
+        }
+
+        /* 主容器样式 */
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+            min-width: 900px;
+        }
+
+        /* 编辑器容器样式 */
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        /* 输入和预览区域基础样式 */
+        .input-section,
+        .preview-section {
+            width: 100%;
+            background-color: var(--output-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 内容区域样式 */
+        .section-content {
+            padding: 20px;
+            min-height: 400px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            background-color: var(--bg-color);
+        }
+
+        /* 文本输入框样式 */
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: none;
+            background-color: var(--input-bg, var(--bg-color));
+            color: var(--text-color);
+            resize: none;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            outline: none;
+            border-radius: 4px;
+        }
+
+        /* 暗色模式下的文本框样式 */
+        [data-theme="dark"] textarea {
+            border: 1px solid var(--border-color);
+        }
+
+        /* 预览区域样式 */
+        #preview {
+            min-height: 400px;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            margin: 0 auto;
+            width: 210mm; /* A4 纸宽度 */
+            color: black;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        /* 预览区域容器样式 */
+        .preview-section .section-content {
+            background-color: var(--output-bg);
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            border: none;
+        }
+
+        /* PDF 预览区域样式优化 */
+        /* 标题样式 */
+        #preview h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: black;
+            font-weight: bold;
+        }
+
+        #preview h2 {
+            font-size: 20px;
+            margin: 15px 0;
+            color: black;
+            font-weight: bold;
+        }
+
+        /* 段落样式 */
+        #preview p {
+            margin: 10px 0;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        /* 图片样式 */
+        #preview img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* 表格样式 */
+        #preview table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background-color: white;
+        }
+
+        #preview th,
+        #preview td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        #preview th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        /* 列表样式 */
+        #preview ul,
+        #preview ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+
+        #preview li {
+            margin: 5px 0;
+        }
+
+        /* 引用块样式 */
+        #preview blockquote {
+            margin: 15px 0;
+            padding: 10px 20px;
+            border-left: 4px solid #ddd;
+            background-color: #f8f9fa;
+            font-style: italic;
+        }
+
+        /* 代码样式 */
+        #preview code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        #preview pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        #preview pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* 暗色模式下预览区域样式 */
+        [data-theme="dark"] #preview {
+            background-color: white;
+            color: black;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+
+        [data-theme="dark"] .preview-section .section-content {
+            background-color: var(--output-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+        }
+
+        /* 区域标题样式 */
+        .section-title {
+            background-color: var(--primary-color);
+            color: white;
+            margin: 0;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            font-size: 16px;
+            text-align: center;
+            user-select: none;
+        }
+
+        /* 暗色模式下的区域标题样式 */
+        [data-theme="dark"] .section-title {
+            background-color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 1000px) {
+            .container {
+                min-width: auto;
+                padding: 0 10px;
+            }
+
+            .editor-container {
+                flex-direction: column;
+            }
+
+            .input-section,
+            .preview-section {
+                min-width: 100%;
+            }
+        }
+
+        /* 转换按钮组样式 */
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--output-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid transparent;
+        }
+
+        /* 转换按钮样式 */
+        button.convert-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 40px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 转换按钮悬浮效果 */
+        button.convert-btn:hover {
+            background-color: #357abd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        /* 转换按钮点击效果 */
+        button.convert-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 转换按钮图标 */
+        button.convert-btn::before {
+            content: "📸";
+            font-size: 20px;
+        }
+
+        /* 转换按钮加载状态 */
+        button.convert-btn.loading {
+            background-color: #666;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        button.convert-btn.loading::before {
+            content: "⏳";
+        }
+
+        /* 暗色模式下按钮组样式 */
+        [data-theme="dark"] .button-group {
+            background-color: var(--output-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+        }
+
+        [data-theme="dark"] button.convert-btn {
+            background-color: var(--primary-color);
+            border: none;
+        }
+
+        [data-theme="dark"] button.convert-btn:hover {
+            background-color: #357abd;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        /* 暗色模式下的容器样式 */
+        [data-theme="dark"] .input-section,
+        [data-theme="dark"] .preview-section {
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        /* 暗色模式下的滚动条样式 */
+        [data-theme="dark"] ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-track {
+            background: var(--input-bg);
+            border-radius: 4px;
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+            border: 2px solid var(--input-bg);
+        }
+
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+
+        /* 添加模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 15% auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            width: 340px;
+        }
+
+        .modal-content img {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .close:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">首页</a>
+            <a href="markdown.htm" class="nav-link">文本清理</a>
+            <a href="html2jpg.html" class="nav-link active">HTML转图片</a>
+            <a href="image-tools.html" class="nav-link">图片工具</a>
+        </div>
+        <div class="right-buttons">
+            <button onclick="toggleTheme()" id="themeToggle">🌙</button>
+            <button class="donation-button" onclick="showDonation()">捐款</button>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <h1>HTML转图片工具</h1>
+        <div class="editor-container">
+            <!-- HTML 输入区域 -->
+            <div class="input-section">
+                <h2 class="section-title">HTML代码</h2>
+                <div class="section-content">
+                    <textarea id="html-input" 
+                        placeholder="在此输入HTML代码..." 
+                        oninput="updatePreview()"
+                        spellcheck="false"></textarea>
+                </div>
+            </div>
+            <!-- 预览区域 -->
+            <div class="preview-section">
+                <h2 class="section-title">实时预览</h2>
+                <div class="section-content">
+                    <div id="preview"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 转换按钮 -->
+        <div class="button-group">
+            <button class="convert-btn" onclick="saveAsImage(this)">保存图片</button>
+        </div>
+    </div>
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideDonation()">&times;</span>
+            <h2>感谢支持</h2>
+            <img src="https://cdn.jsdelivr.net/gh/jojo34014866/public@main/images/qr-code-image.jpg" alt="QR Code">
+        </div>
+    </div>
+    <script>
+        // 实时预览功能
+        function updatePreview() {
+            const input = document.getElementById('html-input').value;
+            const preview = document.getElementById('preview');
+            // 包装内容以确保样式正确应用
+            const wrappedContent = `
+                <div style="width: 100%; min-height: 100%; 
+                    position: relative; 
+                    background-color: white;">
+                    ${input}
+                </div>
+            `;
+            preview.innerHTML = wrappedContent;
+            // 触发重排以确保内容正确渲染
+            preview.offsetHeight;
+        }
+
+        // 保存为图片功能
+        async function saveAsImage(button) {
+            const input = document.getElementById('html-input').value;
+            if (!input.trim()) {
+                alert('请先输入要转换的HTML内容！');
+                return;
+            }
+
+            // 设置按钮加载状态
+            button.classList.add('loading');
+            button.disabled = true;
+            button.textContent = '正在转换...';
+
+            try {
+                // 直接使用预览区域进行转换，而不是创建临时容器
+                const preview = document.getElementById('preview');
+                
+                // 等待所有图片加载完成
+                await Promise.all(
+                    Array.from(preview.getElementsByTagName('img'))
+                        .map(img => {
+                            if (img.complete) return Promise.resolve();
+                            return new Promise(resolve => {
+                                img.onload = resolve;
+                                img.onerror = resolve;
+                            });
+                        })
+                );
+
+                const canvas = await html2canvas(preview, {
+                    scale: 2, // 提高清晰度
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    allowTaint: true,
+                    logging: false,
+                    width: preview.offsetWidth,
+                    height: preview.offsetHeight
+                });
+
+                // 创建下载链接
+                const link = document.createElement('a');
+                link.download = 'output.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.92);
+                link.click();
+
+            } catch (err) {
+                console.error('图片生成失败:', err);
+                alert('图片生成失败，请重试');
+            } finally {
+                // 恢复按钮状态
+                button.classList.remove('loading');
+                button.disabled = false;
+                button.textContent = '保存图片';
+            }
+        }
+
+        // 主题切换功能
+        function toggleTheme() {
+            const body = document.documentElement;
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                themeButton.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 页面加载时检查主题
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeButton = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeButton.textContent = '☀️';
+            }
+        });
+
+        // 添加捐款相关函数
+        function showDonation() {
+            const modal = document.getElementById('donationModal');
+            modal.style.display = 'block';
+        }
+
+        function hideDonation() {
+            const modal = document.getElementById('donationModal');
+            modal.style.display = 'none';
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('donationModal');
+            if (event.target == modal) {
+                hideDonation();
+            }
+        }
+    </script>
+</body>
+</html> 
