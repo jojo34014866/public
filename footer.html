@@ -1,0 +1,232 @@
+<!-- 页脚组件 -->
+<footer class="footer">
+    <div class="footer-content">
+        <!-- 页脚主要内容 -->
+        <div class="footer-main">
+            <!-- 关于我们 -->
+            <div class="footer-section">
+                <h3>关于万图</h3>
+                <p>专注于提供高效的在线工具，让创作更简单。</p>
+                <div class="social-links">
+                    <a href="https://github.com/your-repo" target="_blank" class="social-link" data-tooltip="GitHub">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.605-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link" onclick="showWechat()" data-tooltip="微信公众号">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55.346.255.779.627.779.627l-.346 1.041s-.151.502.552.502c.502 0 1.755-.502 1.755-.502l2.159-.877c.752.125 1.529.201 2.327.201 4.8 0 8.691-3.288 8.691-7.342 0-4.054-3.891-7.342-8.691-7.342zM12.75 8.5c.502 0 .904-.401.904-.9s-.402-.9-.904-.9c-.501 0-.903.401-.903.9s.402.9.903.9zm-4.459 0c.501 0 .903-.401.903-.9s-.402-.9-.903-.9c-.502 0-.904.401-.904.9s.402.9.904.9z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 快速链接 -->
+            <div class="footer-section">
+                <h3>快速链接</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="markdown.htm">AI文本清理</a></li>
+                    <li><a href="html2jpg.html">HTML转图片</a></li>
+                    <li><a href="image-tools.html">图片工具</a></li>
+                </ul>
+            </div>
+
+            <!-- 帮助支持 -->
+            <div class="footer-section">
+                <h3>帮助支持</h3>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="showPrivacyPolicy()">隐私政策</a></li>
+                    <li><a href="#" onclick="showTerms()">使用条款</a></li>
+                    <li><a href="#" onclick="showFeedback()">反馈建议</a></li>
+                    <li><a href="#" onclick="showDonation()">支持我们</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 页脚底部 -->
+        <div class="footer-bottom">
+            <p class="copyright">© 2024 万图工具. All rights reserved.</p>
+            <p class="icp">浙ICP备xxxxxxxx号</p>
+        </div>
+    </div>
+</footer>
+
+<!-- 页脚样式 -->
+<style>
+.footer {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    padding: 40px 0 20px;
+    margin-top: 60px;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-section h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.footer-section p {
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.social-links {
+    display: flex;
+    gap: 15px;
+}
+
+.social-link {
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.social-link:hover {
+    color: var(--primary-color);
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+.footer-bottom {
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .footer {
+        padding: 30px 0 15px;
+        margin-top: 40px;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+/* 深色模式适配 */
+[data-theme="dark"] .footer {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+</style>
+
+<!-- 页脚脚本 -->
+<script>
+// 显示微信公众号
+function showWechat() {
+    const modal = new Modal({
+        title: '关注微信公众号',
+        content: `
+            <div style="text-align: center; padding: 20px;">
+                <img src="assets/wechat-qr.png" alt="微信公众号二维码" style="max-width: 200px;">
+                <p style="margin-top: 15px;">扫码关注，获取最新动态</p>
+            </div>
+        `,
+        showFooter: false
+    });
+    modal.show();
+}
+
+// 显示隐私政策
+function showPrivacyPolicy() {
+    const modal = new Modal({
+        title: '隐私政策',
+        content: await fetch('components/privacy-policy.html').then(r => r.text()),
+        showFooter: false
+    });
+    modal.show();
+}
+
+// 显示使用条款
+function showTerms() {
+    const modal = new Modal({
+        title: '使用条款',
+        content: await fetch('components/terms.html').then(r => r.text()),
+        showFooter: false
+    });
+    modal.show();
+}
+
+// 显示反馈表单
+function showFeedback() {
+    const feedback = new FeedbackForm();
+    const modal = new Modal({
+        title: '反馈建议',
+        content: feedback.element,
+        showFooter: false
+    });
+    modal.show();
+}
+
+// 显示捐赠信息
+function showDonation() {
+    const modal = new Modal({
+        title: '支持我们',
+        content: `
+            <div style="text-align: center; padding: 20px;">
+                <img src="assets/donation-qr.png" alt="捐赠二维码" style="max-width: 200px;">
+                <p style="margin-top: 15px;">感谢您的支持！</p>
+            </div>
+        `,
+        showFooter: false
+    });
+    modal.show();
+}
+
+// 更新年份
+document.addEventListener('DOMContentLoaded', () => {
+    const yearSpan = document.querySelector('.copyright');
+    yearSpan.textContent = yearSpan.textContent.replace('2024', new Date().getFullYear());
+});
+</script> 

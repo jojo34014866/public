@@ -1,0 +1,181 @@
+<!-- 导航栏组件 -->
+<nav class="nav-bar">
+    <div class="nav-content">
+        <!-- Logo 和标题 -->
+        <div class="nav-brand">
+            <a href="index.html" class="logo">
+                <img src="assets/logo.svg" alt="万图" class="logo-img">
+                <span class="logo-text">万图</span>
+            </a>
+        </div>
+
+        <!-- 导航链接 -->
+        <div class="nav-links">
+            <a href="index.html" class="nav-link" data-page="home">首页</a>
+            <a href="markdown.htm" class="nav-link" data-page="markdown">AI文本清理</a>
+            <a href="html2jpg.html" class="nav-link" data-page="html2jpg">HTML转图片</a>
+            <a href="image-tools.html" class="nav-link" data-page="image">图片工具</a>
+        </div>
+
+        <!-- 右侧工具栏 -->
+        <div class="nav-tools">
+            <!-- 主题切换按钮 -->
+            <button class="tool-button" id="themeToggle" onclick="ThemeManager.toggle()" data-tooltip="切换主题">
+                <span class="theme-icon">🌙</span>
+            </button>
+            
+            <!-- 捐赠按钮 -->
+            <button class="tool-button" onclick="showDonation()" data-tooltip="支持作者">
+                <span class="donation-icon">❤️</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- 导航栏样式 -->
+<style>
+.nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: var(--bg-color);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+}
+
+.nav-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.logo-img {
+    height: 24px;
+    width: auto;
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background-color: var(--hover-color);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    background-color: var(--active-color);
+}
+
+.nav-tools {
+    display: flex;
+    gap: 10px;
+}
+
+.tool-button {
+    padding: 8px;
+    border: none;
+    background: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
+}
+
+.tool-button:hover {
+    background-color: var(--hover-color);
+    color: var(--text-primary);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .nav-content {
+        padding: 0 10px;
+    }
+
+    .logo-text {
+        display: none;
+    }
+
+    .nav-links {
+        gap: 10px;
+    }
+
+    .nav-link {
+        padding: 6px 8px;
+        font-size: 14px;
+    }
+}
+
+/* 暗色模式适配 */
+[data-theme="dark"] .nav-bar {
+    background-color: var(--bg-color);
+    border-bottom: 1px solid var(--border-color);
+}
+</style>
+
+<!-- 导航栏脚本 -->
+<script>
+// 设置当前页面的导航链接为激活状态
+document.addEventListener('DOMContentLoaded', () => {
+    const currentPath = window.location.pathname;
+    const currentPage = currentPath.split('/').pop();
+    const links = document.querySelectorAll('.nav-link');
+    
+    links.forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        }
+    });
+});
+
+// 显示捐赠弹窗
+function showDonation() {
+    const modal = new Modal({
+        title: '支持作者',
+        content: `
+            <div style="text-align: center; padding: 20px;">
+                <img src="assets/donation-qr.png" alt="捐赠二维码" style="max-width: 200px;">
+                <p style="margin-top: 15px;">感谢您的支持！</p>
+            </div>
+        `,
+        showFooter: false
+    });
+    modal.show();
+}
+</script> 

@@ -1,0 +1,427 @@
+<!-- 反馈表单组件 -->
+<template id="feedback-template">
+    <div class="feedback-form">
+        <div class="feedback-header">
+            <h3>反馈建议</h3>
+            <p>您的反馈对我们很重要，帮助我们做得更好！</p>
+        </div>
+        
+        <form id="feedbackForm" class="feedback-content">
+            <!-- 反馈类型 -->
+            <div class="form-group">
+                <label for="feedbackType">反馈类型</label>
+                <div class="feedback-type-buttons">
+                    <button type="button" class="type-button active" data-type="suggestion">
+                        <svg class="icon"><!-- 建议图标 --></svg>
+                        功能建议
+                    </button>
+                    <button type="button" class="type-button" data-type="bug">
+                        <svg class="icon"><!-- 错误图标 --></svg>
+                        问题反馈
+                    </button>
+                    <button type="button" class="type-button" data-type="other">
+                        <svg class="icon"><!-- 其他图标 --></svg>
+                        其他
+                    </button>
+                </div>
+                <input type="hidden" id="feedbackType" name="type" value="suggestion">
+            </div>
+
+            <!-- 反馈内容 -->
+            <div class="form-group">
+                <label for="feedbackContent">反馈内容</label>
+                <textarea 
+                    id="feedbackContent" 
+                    name="content" 
+                    placeholder="请详细描述您的建议或遇到的问题..."
+                    required
+                ></textarea>
+                <div class="word-count">0/500</div>
+            </div>
+
+            <!-- 联系方式（可选） -->
+            <div class="form-group">
+                <label for="contactInfo">
+                    联系方式（可选）
+                    <span class="label-hint">用于反馈结果通知</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="contactInfo" 
+                    name="contact"
+                    placeholder="邮箱或其他联系方式"
+                >
+            </div>
+
+            <!-- 图片上传（可选） -->
+            <div class="form-group">
+                <label>
+                    上传截图（可选）
+                    <span class="label-hint">最多3张，每张不超过2MB</span>
+                </label>
+                <div class="image-upload-area" id="imageUploadArea">
+                    <div class="upload-button">
+                        <svg class="icon"><!-- 上传图标 --></svg>
+                        <span>点击上传</span>
+                    </div>
+                    <input type="file" id="imageUpload" multiple accept="image/*" hidden>
+                    <div class="image-preview-list"></div>
+                </div>
+            </div>
+        </form>
+
+        <!-- 提交按钮 -->
+        <div class="feedback-footer">
+            <button type="button" class="button button-secondary" onclick="closeFeedback()">
+                取消
+            </button>
+            <button type="submit" class="button button-primary" onclick="submitFeedback()">
+                提交反馈
+            </button>
+        </div>
+    </div>
+</template>
+
+<style>
+.feedback-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.feedback-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.feedback-header h3 {
+    color: var(--text-primary);
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.feedback-header p {
+    color: var(--text-secondary);
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.label-hint {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+.feedback-type-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.type-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.type-button:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.type-button.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.type-button .icon {
+    width: 20px;
+    height: 20px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    resize: vertical;
+    transition: border-color var(--transition-fast);
+}
+
+textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.word-count {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast);
+}
+
+input[type="text"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.image-upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.image-upload-area:hover {
+    border-color: var(--primary-color);
+}
+
+.upload-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.image-preview-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.image-preview {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview .remove-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.feedback-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .feedback-type-buttons {
+        flex-direction: column;
+    }
+
+    .type-button {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+class FeedbackForm {
+    constructor() {
+        this.init();
+        this.bindEvents();
+    }
+
+    init() {
+        const template = document.getElementById('feedback-template');
+        this.element = template.content.cloneNode(true).firstElementChild;
+        this.imageFiles = [];
+    }
+
+    bindEvents() {
+        // 反馈类型选择
+        this.element.querySelectorAll('.type-button').forEach(button => {
+            button.addEventListener('click', () => {
+                this.selectType(button.dataset.type);
+            });
+        });
+
+        // 字数统计
+        const textarea = this.element.querySelector('#feedbackContent');
+        textarea.addEventListener('input', () => {
+            this.updateWordCount(textarea);
+        });
+
+        // 图片上传
+        const uploadArea = this.element.querySelector('.image-upload-area');
+        const fileInput = this.element.querySelector('#imageUpload');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            this.handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            this.handleFiles(e.target.files);
+        });
+    }
+
+    selectType(type) {
+        this.element.querySelectorAll('.type-button').forEach(button => {
+            button.classList.toggle('active', button.dataset.type === type);
+        });
+        this.element.querySelector('#feedbackType').value = type;
+    }
+
+    updateWordCount(textarea) {
+        const count = textarea.value.length;
+        const maxLength = 500;
+        this.element.querySelector('.word-count').textContent = `${count}/${maxLength}`;
+        
+        if (count > maxLength) {
+            textarea.value = textarea.value.slice(0, maxLength);
+        }
+    }
+
+    async handleFiles(files) {
+        for (const file of files) {
+            if (this.imageFiles.length >= 3) {
+                Toast.show('最多只能上传3张图片', 'warning');
+                break;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                Toast.show('请上传图片文件', 'error');
+                continue;
+            }
+            
+            if (file.size > 2 * 1024 * 1024) {
+                Toast.show('图片大小不能超过2MB', 'error');
+                continue;
+            }
+
+            this.imageFiles.push(file);
+            await this.addImagePreview(file);
+        }
+    }
+
+    async addImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const preview = document.createElement('div');
+            preview.className = 'image-preview';
+            preview.innerHTML = `
+                <img src="${e.target.result}">
+                <div class="remove-button" onclick="this.removeImage(${this.imageFiles.length - 1})">×</div>
+            `;
+            this.element.querySelector('.image-preview-list').appendChild(preview);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    removeImage(index) {
+        this.imageFiles.splice(index, 1);
+        this.element.querySelectorAll('.image-preview')[index].remove();
+    }
+
+    async submit() {
+        const form = this.element.querySelector('#feedbackForm');
+        const formData = new FormData(form);
+        
+        // 添加图片
+        this.imageFiles.forEach((file, index) => {
+            formData.append(`image${index}`, file);
+        });
+
+        try {
+            Loading.show('提交反馈中...');
+            // 这里添加实际的提交逻辑
+            await new Promise(resolve => setTimeout(resolve, 1000)); // 模拟提交
+            Toast.show('感谢您的反馈！', 'success');
+            this.close();
+        } catch (error) {
+            Toast.show('提交失败，请重试', 'error');
+        } finally {
+            Loading.hide();
+        }
+    }
+
+    close() {
+        const modal = this.element.closest('.modal');
+        if (modal) {
+            modal.querySelector('.modal-close').click();
+        }
+    }
+}
+
+// 导出组件
+window.FeedbackForm = FeedbackForm;
+
+// 使用示例：
+// const feedback = new FeedbackForm();
+// const modal = new Modal({
+//     title: '反馈建议',
+//     content: feedback.element,
+//     showFooter: false
+// });
+// modal.show();
+</script> 
