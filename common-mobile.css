@@ -1,162 +1,155 @@
 /* 移动端适配样式 */
 @media screen and (max-width: 768px) {
-    /* 导航栏适配 */
+    /* 导航栏样式调整 */
     .nav-bar {
-        padding: 10px;
         flex-direction: column;
+        padding: 10px;
         gap: 10px;
-    }
-
-    .nav-links {
+        position: fixed;
         width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 5px;
-        justify-content: flex-start;
-        gap: 10px;
+        box-sizing: border-box;
+        background-color: var(--bg-color);
+        z-index: 1000;
     }
 
+    /* 导航链接容器 */
+    .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    /* 导航链接样式 */
     .nav-link {
-        padding: 6px 12px;
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        padding: 10px;
         white-space: nowrap;
         font-size: 14px;
     }
 
+    /* 右侧按钮组 */
     .right-buttons {
-        width: 100%;
+        display: flex;
         justify-content: center;
         gap: 10px;
+        padding: 5px 0;
+        border-top: 1px solid var(--border-color);
     }
 
-    /* 通用容器适配 */
+    /* 右侧按钮样式 */
+    .right-buttons button {
+        min-width: 80px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    /* 主题切换按钮 */
+    #themeToggle {
+        min-width: unset;
+        padding: 8px;
+    }
+
+    /* 主要内容区域调整 */
     .container {
+        margin-top: 120px; /* 减小顶部边距 */
         padding: 10px;
-        margin: 10px;
-        min-width: auto;
     }
 
-    /* 标题适配 */
-    h1 {
-        font-size: 20px;
-        margin: 10px 0;
-    }
-
-    h2 {
-        font-size: 18px;
-    }
-
-    /* 工具卡片适配 (首页) */
+    /* 工具卡片网格 */
     .tools-grid {
         grid-template-columns: 1fr;
         gap: 15px;
         padding: 10px;
     }
 
-    .tool-card {
-        padding: 15px;
-    }
-
-    /* 编辑器容器适配 (HTML转图片页面) */
+    /* 编辑器容器 */
     .editor-container {
-        gap: 15px;
+        flex-direction: column;
     }
 
-    .section-content {
-        padding: 10px;
-    }
-
-    #preview {
+    /* 输入和预览区域 */
+    .input-section,
+    .preview-section {
         width: 100%;
-        padding: 15px;
+        margin: 10px 0;
     }
 
-    /* 按钮组适配 */
+    /* 按钮组样式 */
     .button-group {
-        display: flex;
         flex-direction: column;
         gap: 10px;
-        padding: 15px;
     }
 
+    /* 按钮样式 */
     button {
         width: 100%;
-        padding: 10px;
-        font-size: 14px;
+        margin: 5px 0;
     }
 
-    /* 图片工具页面适配 */
-    .tool-section {
+    /* 模态框内容 */
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
         padding: 15px;
     }
 
+    /* 图片工具相关样式 */
     .controls {
         grid-template-columns: 1fr;
     }
 
-    .settings label {
-        font-size: 14px;
+    .settings {
+        margin: 10px 0;
     }
 
-    /* 模态框适配 */
-    .modal-content {
-        width: 90%;
-        margin: 30% auto;
-        padding: 15px;
-    }
-
-    .modal-content img {
-        width: 100%;
-        height: auto;
-        max-width: 300px;
-        max-height: 300px;
-    }
-
-    /* 输入框和输出区域适配 */
-    textarea {
-        font-size: 14px;
-        padding: 10px;
-    }
-
-    .output {
-        padding: 15px;
-        font-size: 14px;
-    }
-
-    /* 预览区域适配 */
-    .preview-content {
-        padding: 10px;
-    }
-
-    #preview-image {
+    /* 预览图片容器 */
+    #preview {
         max-width: 100%;
-    }
-
-    /* 滚动条优化 */
-    ::-webkit-scrollbar {
-        width: 4px;
-        height: 4px;
-    }
-
-    /* 输入输出区域高度优化 */
-    textarea, .output {
-        height: auto;
-        min-height: 150px;
     }
 }
 
-/* 超小屏幕适配 */
+/* 超小屏幕适配优化 */
 @media screen and (max-width: 320px) {
+    /* 导航栏超小屏幕调整 */
+    .nav-bar {
+        padding: 8px;             /* 进一步减小内边距 */
+    }
+
+    /* 导航链接超小屏幕调整 */
     .nav-link {
-        padding: 4px 8px;
-        font-size: 13px;
+        padding: 6px 10px;        /* 减小内边距 */
+        font-size: 14px;          /* 减小字号 */
     }
 
-    button {
-        padding: 8px;
-        font-size: 13px;
+    /* 右侧按钮超小屏幕调整 */
+    .right-buttons button {
+        padding: 6px 10px;        /* 减小内边距 */
+        font-size: 14px;          /* 减小字号 */
     }
 
+    /* 容器超小屏幕调整 */
+    .container {
+        margin-top: 100px;        /* 增加顶部边距 */
+        padding: 5px;             /* 最小内边距 */
+    }
+
+    /* 按钮组超小屏幕调整 */
+    .button-group {
+        padding: 10px;            /* 减小内边距 */
+    }
+
+    /* 转换按钮超小屏幕调整 */
+    .convert-btn {
+        padding: 8px 16px;        /* 调整内边距 */
+        font-size: 14px;          /* 减小字号 */
+    }
+
+    /* 模态框超小屏幕调整 */
     .modal-content {
-        width: 95%;
+        width: 95%;              /* 增加宽度占比 */
     }
 } 

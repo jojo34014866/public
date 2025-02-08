@@ -2,8 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <!-- 移动端视口设置 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>万图 - 在线工具集</title>
+    <!-- 引入公共样式表 -->
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="common-mobile.css">
     <style>
         /* 基础变量和主题 */
         :root {
@@ -34,13 +38,15 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* 导航栏样式 */
-        .nav-bar {
+         /* 导航栏样式 */
+         .nav-bar {
             background-color: var(--output-bg);
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
-            position: sticky;
+            position: fixed;  /* 改为 fixed */
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
             display: flex;
             justify-content: space-between;
@@ -159,111 +165,139 @@
             font-size: 24px;
         }
 
+        /* 工具卡片网格布局 */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 30px;
             padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
         }
 
+        /* 工具卡片样式 */
         .tool-card {
             background-color: var(--output-bg);
-            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
-            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-color);
         }
 
         .tool-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .tool-card h2 {
-            margin: 0 0 10px 0;
-            color: var(--text-color);
+            margin: 0 0 15px 0;
+            font-size: 20px;
+            color: var(--primary-color);
         }
 
         .tool-card p {
-            margin: 0 0 15px 0;
+            margin: 0;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        /* 添加模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 15% auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            width: 340px;
+        }
+
+        .modal-content img {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 5px;
+            font-size: 24px;
+            cursor: pointer;
             color: var(--text-color);
         }
 
-        .tool-card a {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4a90e2;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .tool-card a:hover {
-            background-color: #357abd;
+        .close:hover {
+            color: var(--primary-color);
         }
     </style>
 </head>
 <body>
+    <!-- 顶部导航栏 -->
     <div class="nav-bar">
         <div class="nav-links">
+            <!-- 导航链接列表 -->
             <a href="index.html" class="nav-link active">首页</a>
-            <a href="markdown.htm" class="nav-link">文本清理</a>
+            <a href="markdown.htm" class="nav-link">AI文本清理</a>
             <a href="html2jpg.html" class="nav-link">HTML转图片</a>
             <a href="image-tools.html" class="nav-link">图片工具</a>
         </div>
         <div class="right-buttons">
+            <!-- 主题切换按钮 -->
             <button onclick="toggleTheme()" id="themeToggle">🌙</button>
+            <!-- 捐款按钮 -->
             <button class="donation-button" onclick="showDonation()">捐款</button>
         </div>
     </div>
 
-    <div class="tools-grid">
-        <div class="tool-card">
-            <h2>文本清理工具</h2>
-            <p>清理Markdown格式，提取纯文本内容</p>
-            <a href="markdown.htm">开始使用</a>
-        </div>
-        <div class="tool-card">
-            <h2>HTML转图片</h2>
-            <p>将HTML内容转换为高清图片</p>
-            <a href="html2jpg.html">开始使用</a>
-        </div>
-        <div class="tool-card">
-            <h2>图片工具</h2>
-            <p>图片格式转换、压缩等功能</p>
-            <a href="image-tools.html">开始使用</a>
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <h1>在线工具集</h1>
+        <!-- 工具卡片网格 -->
+        <div class="tools-grid">
+            <!-- AI文本清理工具卡片 -->
+            <a href="markdown.htm" class="tool-card">
+                <h2>AI文本清理</h2>
+                <p>清理AI生成的文本内容，优化排版和格式</p>
+            </a>
+            <!-- HTML转图片工具卡片 -->
+            <a href="html2jpg.html" class="tool-card">
+                <h2>HTML转图片</h2>
+                <p>将HTML代码转换为高质量图片</p>
+            </a>
+            <!-- 图片工具卡片 -->
+            <a href="image-tools.html" class="tool-card">
+                <h2>图片工具</h2>
+                <p>图片处理工具集合</p>
+            </a>
         </div>
     </div>
 
-    <script>
-        function toggleTheme() {
-            const body = document.documentElement;
-            const themeButton = document.getElementById('themeToggle');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                themeButton.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeButton.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
-            }
-        }
+    <!-- 捐款模态框 -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <!-- 关闭按钮 -->
+            <span class="close" onclick="hideDonation()">&times;</span>
+            <h2>感谢支持</h2>
+            <!-- 二维码图片 -->
+            <img src="https://cdn.jsdelivr.net/gh/jojo34014866/public@main/images/qr-code-image.jpg" alt="QR Code">
+        </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            const themeButton = document.getElementById('themeToggle');
-            
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeButton.textContent = '☀️';
-            }
-        });
-    </script>
+    <!-- 引入公共JavaScript -->
+    <script src="common.js"></script>
 </body>
 </html> 

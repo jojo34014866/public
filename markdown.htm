@@ -3,12 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>万图</title>
+    <title>AI文本清理 - 万图</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="theme.css">
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="common-mobile.css">
     <style>
+        /* 基础变量和主题 */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --output-bg: #f8f9fa;
+            --primary-color: #4a90e2;
+            --success-color: #28a745;
+            --hover-color: rgba(74, 144, 226, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #404040;
+            --output-bg: #2d2d2d;
+        }
+
         body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
             font-family: Arial, sans-serif;
-            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
         }
         
         h1 {
@@ -21,19 +47,22 @@
             width: 100%;
             height: 150px;
             margin-bottom: 10px;
+            background-color: var(--output-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
         }
         .output {
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
             margin-bottom: 20px;
             white-space: pre-wrap;
-            background-color: #f8f9fa;
+            background-color: var(--output-bg);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             font-size: 16px;
             line-height: 1.6;
-            color: #333;
+            color: var(--text-color);
             height: auto;
             min-height: 200px;
             max-height: none;
@@ -56,32 +85,28 @@
         }
         /* 统一的按钮基础样式 */
         button {
-            padding: 10px 20px;
-            margin: 5px;
+            padding: 8px 16px;
             border: none;
             border-radius: 6px;
-            font-size: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background-color: #4a90e2;
+            font-size: 15px;
+            background-color: var(--primary-color);
             color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         button:hover {
-            background-color: #357abd;
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
         button:active {
-            transform: translateY(1px);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            transform: translateY(0);
         }
 
         /* 捐款按钮特殊样式 */
         .donation-button {
-            background-color: #28a745;
+            background-color: var(--success-color);
         }
 
         .donation-button:hover {
@@ -117,16 +142,18 @@
         }
         .modal-content {
             position: relative;
-            margin: auto;
-            margin-top: 50px;
-            max-width: 500px;
-            background: white;
+            margin: 15% auto;
             padding: 20px;
-            border-radius: 5px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            width: 340px; /* 稍微大于图片宽度，留出padding空间 */
         }
         .modal-content img {
-            width: 100%;
-            height: auto;
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            display: block;
+            margin: 10px auto;
         }
         .close {
             position: absolute;
@@ -156,113 +183,686 @@
             margin: 0;  /* 移除标题默认边距 */
             flex-grow: 1;  /* 让标题占据中间空间 */
         }
+        /* 添加预览模态框样式 */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .preview-content {
+            position: relative;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            max-width: 90%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .preview-buttons {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-preview:hover {
+            color: #333;
+        }
+
+        #preview-image {
+            max-width: 100%;
+            height: auto;
+        }
+        /* 修改输入区域容器样式 */
+        .input-section {
+            background-color: var(--bg-color);
+            padding: 20px;
+            z-index: 100;
+        }
+
+        /* 调整主体内容区域样式 */
+        .content-section {
+            padding: 0 20px 20px;
+        }
+
+        /* 调整按钮在暗色模式下的样式 */
+        [data-theme="dark"] button {
+            background-color: #2d2d2d;
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] button:hover {
+            background-color: #3d3d3d;
+        }
+
+        /* 保持特殊按钮的颜色 */
+        [data-theme="dark"] .donation-button {
+            background-color: #28a745;
+            border: none;
+        }
+
+        [data-theme="dark"] .donation-button:hover {
+            background-color: #218838;
+        }
+
+        /* 修改模态框在暗色模式下的样式 */
+        [data-theme="dark"] .modal-content,
+        [data-theme="dark"] .preview-content {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+        }
+
+        /* 修改关闭按钮在暗色模式下的颜色 */
+        [data-theme="dark"] .close,
+        [data-theme="dark"] .close-preview {
+            color: var(--text-color);
+        }
+
+        /* 修改标题在暗色模式下的颜色 */
+        [data-theme="dark"] h1 {
+            color: var(--text-color);
+        }
+
+        /* 添加导航栏样式 */
+        .nav-bar {
+            background-color: var(--output-bg);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .nav-link:hover {
+            background-color: var(--hover-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .right-buttons {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* 主题切换按钮 */
+        #themeToggle {
+            background: none;
+            padding: 8px;
+            font-size: 18px;
+        }
+
+        /* 编辑器容器布局 */
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;  /* 左右等分 */
+            gap: 30px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            height: calc(100vh - 120px);  /* 减去导航栏高度 */
+        }
+
+        /* 编辑器面板基础样式 */
+        .editor-panel {
+            background: var(--output-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 面板标题栏 */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* 工具栏样式 */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tool-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: var(--output-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-button:hover {
+            background: var(--hover-color);
+        }
+
+        .tool-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 编辑区域样式 */
+        .editor-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* 输入框样式 */
+        #input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* 输出区域样式 */
+        #output {
+            width: 100%;
+            height: 100%;
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+
+        /* 状态栏样式 */
+        .status-bar {
+            padding: 8px 15px;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-color);
+        }
+
+        /* 字数统计 */
+        .word-count {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 20px;
+            }
+
+            .editor-panel {
+                height: 50vh;
+            }
+        }
+
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        /* 加载动画 */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 80px auto 40px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* 编辑器面板 */
+        .editor-panel {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 15px 20px;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            background: var(--bg-tertiary);
+        }
+
+        .tool-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool-button:hover {
+            background: var(--hover-color);
+        }
+
+        /* 编辑区域 */
+        .editor-content {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #input, #output {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            border: none;
+            resize: none;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 字数统计 */
+        .word-count {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 转换选项 */
+        .convert-options {
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-group label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* 转换按钮 */
+        .convert-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .convert-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .convert-button:active {
+            transform: translateY(0);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .editor-panel {
+                height: 500px;
+            }
+        }
+
+        /* 深色模式适配 */
+        [data-theme="dark"] .editor-panel {
+            background: var(--bg-secondary);
+        }
+
+        [data-theme="dark"] #input,
+        [data-theme="dark"] #output {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .toolbar,
+        [data-theme="dark"] .convert-options {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
     </style>
 </head>
 <body>
-    <div class="header-container">
-        <div style="width: 100px"></div>  <!-- 左侧占位 -->
-        <h1>文本清洗工具</h1>
-        <button class="donation-button" onclick="showDonation()">捐款</button>
-    </div>
-    <!-- 出自calum -->
-    <textarea id="input" placeholder="粘贴 Markdown 文本..."></textarea>
-    <button onclick="cleanMarkdown()">清洗文本</button>
-    <div class="output-container">
-        <div id="output" class="output"></div>
-    </div>
-    <button onclick="copyText()">复制文本</button>
-    <button onclick="generateImage()">生成图片</button>
-
-    <div id="donationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDonation()">&times;</span>
-            <img src="https://cdn.jsdelivr.net/gh/jojo34014866/public@main/images/qr-code-image.jpg" alt="QR Code">
-
+    <!-- 顶部导航栏 -->
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">首页</a>
+            <a href="markdown.htm" class="nav-link active">AI文本清理</a>
+            <a href="html2jpg.html" class="nav-link">HTML转图片</a>
+            <a href="image-tools.html" class="nav-link">图片工具</a>
+        </div>
+        <div class="right-buttons">
+            <!-- 主题切换按钮 -->
+            <button onclick="toggleTheme()" id="themeToggle">🌙</button>
+            <!-- 捐款按钮 -->
+            <button class="donation-button" onclick="showDonation()">捐款</button>
         </div>
     </div>
 
+    <main class="main-container">
+        <!-- 输入面板 -->
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">输入文本</h2>
+                <div class="panel-actions">
+                    <button class="tool-button" onclick="clearInput()">
+                        <span class="icon">🗑️</span>
+                        清空
+                    </button>
+                </div>
+            </div>
+            <div class="toolbar">
+                <button class="tool-button" onclick="pasteFromClipboard()">
+                    <span class="icon">📋</span>
+                    粘贴
+                </button>
+                <button class="tool-button" onclick="loadFromFile()">
+                    <span class="icon">📁</span>
+                    从文件导入
+                </button>
+            </div>
+            <div class="editor-content">
+                <textarea id="input" placeholder="在此输入或粘贴文本..." spellcheck="false"></textarea>
+                <div class="word-count">0 字</div>
+            </div>
+        </div>
+
+        <!-- 输出面板 -->
+        <div class="editor-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">清理结果</h2>
+                <div class="panel-actions">
+                    <button class="tool-button" onclick="copyOutput()">
+                        <span class="icon">📋</span>
+                        复制
+                    </button>
+                </div>
+            </div>
+            <div class="editor-content">
+                <textarea id="output" readonly></textarea>
+            </div>
+            <div class="convert-options">
+                <div class="options-grid">
+                    <div class="option-group">
+                        <input type="checkbox" id="removeLineBreaks" checked>
+                        <label for="removeLineBreaks">移除多余换行</label>
+                    </div>
+                    <div class="option-group">
+                        <input type="checkbox" id="removeSpaces" checked>
+                        <label for="removeSpaces">移除多余空格</label>
+                    </div>
+                    <div class="option-group">
+                        <input type="checkbox" id="convertPunctuation" checked>
+                        <label for="convertPunctuation">转换标点符号</label>
+                    </div>
+                </div>
+                <button class="convert-button" onclick="processText()">
+                    开始清理
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 捐款模态框 -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideDonation()">&times;</span>
+            <h2>感谢支持</h2>
+            <img src="https://cdn.jsdelivr.net/gh/jojo34014866/public@main/images/qr-code-image.jpg" alt="QR Code">
+        </div>
+    </div>
+
+    <!-- 预览模态框 -->
+    <div id="previewModal" class="preview-modal">
+        <div class="preview-content">
+            <span class="close-preview" onclick="closePreview()">&times;</span>
+            <img id="preview-image" alt="预览图片">
+            <div class="preview-buttons">
+                <button onclick="downloadImage()">下载图片</button>
+                <button onclick="closePreview()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入公共JavaScript和html2canvas库 -->
+    <script src="common.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <!-- 页面特有的JavaScript -->
     <script>
+        /**
+         * 清理Markdown文本
+         * 移除Markdown语法并优化格式
+         */
         function cleanMarkdown() {
             const input = document.getElementById("input").value;
             let text = input;
 
-            // 替换标题
-            text = text.replace(/^#+\s*/gm, "");
+            // 增强的文本清理规则
+            text = text
+                // 移除标题标记
+                .replace(/^#+\s*/gm, "")
+                // 移除粗体和斜体标记
+                .replace(/[*_]{1,2}(.*?)[*_]{1,2}/g, "$1")
+                // 处理代码块，保留内容
+                .replace(/```[\s\S]*?\n([\s\S]*?)```/g, "代码块:\n$1\n")
+                // 处理行内代码
+                .replace(/`([^`]+)`/g, "$1")
+                // 优化列表处理
+                .replace(/^\s*[-*+]\s+/gm, "• ")
+                .replace(/^\s*\d+\.\s+/gm, "• ")
+                // 移除链接，保留文本
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+                // 移除图片标记
+                .replace(/!\[.*?\]\(.*?\)/g, "")
+                // 移除HTML标签
+                .replace(/<[^>]+>/g, "")
+                // 处理引用
+                .replace(/^\s*>\s*/gm, "")
+                // 移除多余空行
+                .replace(/\n{3,}/g, "\n\n")
+                // 移除水平分割线
+                .replace(/^-{3,}$|^_{3,}$|^\*{3,}$/gm, "");
 
-            // 替换粗体/斜体
-            text = text.replace(/\*\*(.*?)\*\*/g, "$1");
-            text = text.replace(/\*(.*?)\*/g, "$1");
-
-            // 处理代码块
-            text = text.replace(/```[\s\S]*?\n([\s\S]*?)```/g, "代码块:\n$1\n");
-
-            // 处理列表
-            text = text.replace(/^\s*[-*+]\s+/gm, "• ");
-
-            // 删除图片链接
-            text = text.replace(/!\[.*?\]\(.*?\)/g, "");
-
-            // 显示结果
+            // 显示清理后的结果
             document.getElementById("output").textContent = text.trim();
         }
 
+        /**
+         * 生成图片
+         * 将输出内容转换为图片
+         */
         function generateImage() {
             const output = document.getElementById("output");
             
-            // 检查输出内容是否为空
+            // 检查是否有内容
             if (!output.textContent.trim()) {
                 alert("没有可以生成图片的内容！");
                 return;
             }
 
-            // 使用 html2canvas 将输出内容渲染为图片
+            // 使用html2canvas生成图片
             html2canvas(output, {
-                // 设置背景色
                 backgroundColor: '#f8f9fa',
-                // 设置缩放比例，提高清晰度
                 scale: 2,
-                // 设置完整高度捕获
                 height: output.scrollHeight,
-                // 设置完整宽度捕获
                 width: output.scrollWidth,
-                // 设置是否使用窗口大小
                 windowWidth: output.scrollWidth,
                 windowHeight: output.scrollHeight
             }).then(canvas => {
-                // 创建下载链接
-                const link = document.createElement("a");
-                link.download = "cleaned-text.png";
-                link.href = canvas.toDataURL("image/png");
-                link.click();
+                // 显示预览
+                const previewModal = document.getElementById("previewModal");
+                const previewImage = document.getElementById("preview-image");
+                previewImage.src = canvas.toDataURL("image/png");
+                previewModal.style.display = "block";
+                
+                // 保存canvas用于后续下载
+                window.tempCanvas = canvas;
             });
         }
 
-        function showDonation() {
-            document.getElementById("donationModal").style.display = "block";
-        }
-
-        function closeDonation() {
-            document.getElementById("donationModal").style.display = "none";
-        }
-
-        // 点击模态框外部关闭
-        window.onclick = function(event) {
-            const modal = document.getElementById("donationModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-
+        /**
+         * 复制文本
+         * 将输出内容复制到剪贴板
+         */
         function copyText() {
             const output = document.getElementById("output");
             
-            // 检查是否有内容可复制
+            // 检查是否有内容
             if (!output.textContent.trim()) {
                 alert("没有可以复制的内容！");
                 return;
             }
 
-            // 复制文本到剪贴板
+            // 复制到剪贴板
             navigator.clipboard.writeText(output.textContent)
                 .then(() => {
                     alert("文本已复制到剪贴板！");
@@ -272,6 +872,38 @@
                     console.error('复制失败:', err);
                 });
         }
+
+        /**
+         * 下载图片
+         * 将预览的图片下载到本地
+         */
+        function downloadImage() {
+            if (window.tempCanvas) {
+                const link = document.createElement("a");
+                link.download = "cleaned-text.png";
+                link.href = window.tempCanvas.toDataURL("image/png");
+                link.click();
+                closePreview();
+            }
+        }
+
+        /**
+         * 关闭预览
+         * 关闭图片预览模态框
+         */
+        function closePreview() {
+            const previewModal = document.getElementById("previewModal");
+            previewModal.style.display = "none";
+            window.tempCanvas = null;
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 添加输入监听，实现实时清理
+            document.getElementById('input').addEventListener('input', function() {
+                cleanMarkdown();
+            });
+        });
     </script>
 </body>
 </html>

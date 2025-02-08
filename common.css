@@ -1,0 +1,162 @@
+/* 定义全局 CSS 变量，用于主题切换 */
+:root {
+    --bg-color: #ffffff;        /* 背景色 */
+    --text-color: #333333;      /* 文本色 */
+    --border-color: #e0e0e0;    /* 边框色 */
+    --output-bg: #f8f9fa;       /* 输出区域背景色 */
+    --primary-color: #4a90e2;   /* 主要强调色 */
+    --success-color: #28a745;   /* 成功状态色 */
+    --hover-color: rgba(74, 144, 226, 0.1);  /* 悬停效果色 */
+}
+
+/* 暗色主题变量 */
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;        /* 暗色背景 */
+    --text-color: #ffffff;      /* 暗色文本 */
+    --border-color: #404040;    /* 暗色边框 */
+    --output-bg: #2d2d2d;       /* 暗色输出区域 */
+}
+
+/* 基础页面样式 */
+body {
+    background-color: var(--bg-color);    /* 使用变量设置背景色 */
+    color: var(--text-color);             /* 使用变量设置文本色 */
+    font-family: Arial, sans-serif;       /* 设置字体族 */
+    margin: 0;                            /* 移除默认外边距 */
+    padding: 0;                           /* 移除默认内边距 */
+    min-height: 100vh;                    /* 最小高度为视口高度 */
+    transition: background-color 0.3s, color 0.3s;  /* 添加过渡效果 */
+}
+
+/* 导航栏容器样式 */
+.nav-bar {
+    background-color: var(--output-bg);   /* 导航栏背景色 */
+    padding: 15px 20px;                   /* 内边距 */
+    border-bottom: 1px solid var(--border-color);  /* 底部边框 */
+    position: fixed;                      /* 固定定位 */
+    top: 0;                              /* 顶部对齐 */
+    left: 0;                             /* 左侧对齐 */
+    right: 0;                            /* 右侧对齐 */
+    z-index: 1000;                       /* 层级设置 */
+    display: flex;                       /* 弹性布局 */
+    justify-content: space-between;      /* 两端对齐 */
+    align-items: center;                 /* 垂直居中 */
+    height: 60px;                        /* 固定高度 */
+    box-sizing: border-box;              /* 盒模型设置 */
+}
+
+/* 导航链接容器样式 */
+.nav-links {
+    display: flex;                       /* 弹性布局 */
+    gap: 20px;                          /* 元素间距 */
+    height: 100%;                       /* 继承父容器高度 */
+    align-items: center;                /* 垂直居中 */
+}
+
+/* 导航链接样式 */
+.nav-link {
+    color: var(--text-color);           /* 链接颜色 */
+    text-decoration: none;              /* 移除下划线 */
+    padding: 8px 20px;                  /* 内边距 */
+    border-radius: 4px;                 /* 圆角 */
+    transition: background-color 0.3s;   /* 过渡效果 */
+    font-size: 18px;                    /* 字体大小 */
+    line-height: 1.5;                   /* 行高 */
+    height: 40px;                       /* 固定高度 */
+    display: flex;                      /* 弹性布局 */
+    align-items: center;                /* 垂直居中 */
+}
+
+/* 右侧按钮容器样式 */
+.right-buttons {
+    display: flex;                      /* 弹性布局 */
+    gap: 12px;                         /* 按钮间距 */
+    align-items: center;               /* 垂直居中 */
+    height: 100%;                      /* 继承父容器高度 */
+}
+
+/* 右侧按钮通用样式 */
+.right-buttons button {
+    padding: 8px 20px;                 /* 内边距 */
+    border: none;                      /* 移除边框 */
+    border-radius: 4px;                /* 圆角 */
+    cursor: pointer;                   /* 鼠标指针 */
+    transition: all 0.3s;              /* 过渡效果 */
+    font-size: 18px;                   /* 字体大小 */
+    height: 40px;                      /* 固定高度 */
+    display: flex;                     /* 弹性布局 */
+    align-items: center;               /* 垂直居中 */
+}
+
+/* 捐款按钮特殊样式 */
+.donation-button {
+    background-color: var(--success-color) !important;  /* 背景色 */
+    color: white !important;                           /* 文字颜色 */
+    padding: 8px 20px !important;                      /* 内边距 */
+    height: 40px !important;                           /* 固定高度 */
+    font-size: 18px !important;                        /* 字体大小 */
+}
+
+/* 主题切换按钮样式 */
+#themeToggle {
+    width: 40px;                       /* 固定宽度 */
+    height: 40px;                      /* 固定高度 */
+    padding: 0;                        /* 移除内边距 */
+    justify-content: center;           /* 水平居中 */
+    font-size: 22px;                   /* 图标大小 */
+}
+
+/* 导航链接激活状态样式 */
+.nav-link.active {
+    background-color: var(--primary-color);  /* 激活背景色 */
+    color: white;                            /* 激活文字颜色 */
+}
+
+/* 导航链接悬停效果 */
+.nav-link:hover:not(.active) {
+    background-color: var(--hover-color);    /* 悬停背景色 */
+}
+
+/* 容器顶部边距统一 */
+.container {
+    margin-top: 80px; /* 导航栏高度 + 间距 */
+    padding: 0 20px;
+}
+
+/* 模态框样式 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    margin: 15% auto;
+    padding: 20px;
+    background-color: var(--bg-color);
+    border-radius: 8px;
+    width: 340px;
+}
+
+.modal-content img {
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
+    display: block;
+    margin: 10px auto;
+}
+
+.close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-color);
+} 

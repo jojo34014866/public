@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图片工具 - 万图</title>
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="common-mobile.css">
     <style>
         :root {
             --bg-color: #ffffff;
             --text-color: #333333;
             --border-color: #e0e0e0;
             --output-bg: #f8f9fa;
+            --success-color: #28a745;
         }
 
         [data-theme="dark"] {
@@ -69,83 +72,171 @@
         }
 
         .tool-section {
-            background-color: var(--output-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .image-preview {
-            max-width: 100%;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            max-height: 500px;
-            border: 1px solid var(--border-color);
-        }
-
-        .controls {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
         }
 
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #4a90e2;
-            color: white;
+        .control-panel {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+            background: var(--output-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
 
-        button:hover {
-            background-color: #357abd;
+        .preview-panel {
+            background: var(--output-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
         }
 
-        input[type="file"] {
-            display: none;
-        }
-
-        .upload-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4a90e2;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .upload-btn:hover {
-            background-color: #357abd;
-        }
-
-        h1 {
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
             text-align: center;
+            transition: all 0.3s;
+            background: var(--bg-color);
+            cursor: pointer;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: var(--hover-color);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .upload-text {
+            text-align: center;
+        }
+
+        .settings-group {
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .settings-group h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
             color: var(--text-color);
-            margin: 20px 0;
         }
 
-        .settings {
-            margin: 20px 0;
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        .settings label {
-            display: block;
-            margin: 10px 0;
+        .input-group input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-color);
+            color: var(--text-color);
         }
 
         input[type="range"] {
             width: 100%;
-            margin: 10px 0;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 3px;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .preview-container {
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: repeating-conic-gradient(
+                #80808020 0% 25%, 
+                transparent 0% 50%
+            ) 50% / 20px 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .primary-button {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .secondary-button {
+            background: var(--bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .tool-section {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+
+            .control-panel {
+                position: static;
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
@@ -153,7 +244,7 @@
     <div class="nav-bar">
         <div class="nav-links">
             <a href="index.html" class="nav-link">首页</a>
-            <a href="markdown.htm" class="nav-link">文本清理</a>
+            <a href="markdown.htm" class="nav-link">AI文本清理</a>
             <a href="html2jpg.html" class="nav-link">HTML转图片</a>
             <a href="image-tools.html" class="nav-link active">图片工具</a>
         </div>
@@ -167,121 +258,300 @@
         <h1>图片工具</h1>
         
         <div class="tool-section">
-            <label class="upload-btn">
-                选择图片
-                <input type="file" accept="image/*" onchange="handleImageUpload(event)">
-            </label>
-            
-            <div class="image-preview">
-                <img id="preview" style="display: none;">
+            <div class="control-panel">
+                <div class="drop-zone" id="dropZone">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        <strong>点击或拖放图片</strong>
+                        <p>支持 JPG、PNG、WebP (最大 10MB)</p>
+                    </div>
+                    <input type="file" id="imageInput" hidden accept="image/*">
+                </div>
+
+                <div class="settings-group">
+                    <h3>尺寸调整</h3>
+                    <div class="input-group">
+                        <label>宽度</label>
+                        <input type="number" id="widthInput" min="1">
+                        <button class="reset-button" onclick="resetDimension('width')">↺</button>
+                    </div>
+                    <div class="input-group">
+                        <label>高度</label>
+                        <input type="number" id="heightInput" min="1">
+                        <button class="reset-button" onclick="resetDimension('height')">↺</button>
+                    </div>
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="maintainAspectRatio" checked>
+                        保持宽高比
+                    </label>
+                </div>
+
+                <div class="settings-group">
+                    <h3>输出设置</h3>
+                    <div class="quality-control">
+                        <label>质量: <span id="qualityValue">90%</span></label>
+                        <input type="range" id="qualityInput" min="0" max="100" value="90">
+                    </div>
+                    <div class="format-control">
+                        <label>格式</label>
+                        <select id="formatSelect">
+                            <option value="image/jpeg">JPEG</option>
+                            <option value="image/png">PNG</option>
+                            <option value="image/webp">WebP</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-button primary-button" onclick="downloadImage()">
+                        <span>💾</span> 下载图片
+                    </button>
+                    <button class="action-button secondary-button" onclick="resetAll()">
+                        <span>↺</span> 重置
+                    </button>
+                </div>
             </div>
 
-            <div class="settings">
-                <label>
-                    压缩质量: <span id="quality-value">80%</span>
-                    <input type="range" id="quality" min="1" max="100" value="80" oninput="updateQuality()">
-                </label>
-            </div>
-
-            <div class="controls">
-                <button onclick="compressImage()">压缩图片</button>
-                <button onclick="convertToJPG()">转换为JPG</button>
-                <button onclick="convertToPNG()">转换为PNG</button>
+            <div class="preview-panel">
+                <div class="preview-container">
+                    <img id="previewImage" alt="预览图片">
+                    <div class="image-info">
+                        <span id="dimensionsInfo">0 × 0</span>
+                        <span id="sizeInfo">0 KB</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideDonation()">&times;</span>
+            <h2>感谢支持</h2>
+            <img src="https://cdn.jsdelivr.net/gh/jojo34014866/public@main/images/qr-code-image.jpg" alt="QR Code">
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    
     <script>
-        let currentImage = null;
+        let originalImage = {
+            width: 0,
+            height: 0,
+            aspectRatio: 1,
+            file: null
+        };
 
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.getElementById('preview');
-                    img.src = e.target.result;
-                    img.style.display = 'block';
-                    currentImage = e.target.result;
-                }
-                reader.readAsDataURL(file);
+        function initImageTool() {
+            setupDropZone();
+            setupEventListeners();
+            setupImageInput();
+        }
+
+        function setupDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            
+            dropZone.addEventListener('click', () => {
+                document.getElementById('imageInput').click();
+            });
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+                dropZone.addEventListener(event, preventDefault);
+            });
+
+            ['dragenter', 'dragover'].forEach(event => {
+                dropZone.addEventListener(event, () => {
+                    dropZone.classList.add('dragover');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(event => {
+                dropZone.addEventListener(event, () => {
+                    dropZone.classList.remove('dragover');
+                });
+            });
+
+            dropZone.addEventListener('drop', handleDrop);
+        }
+
+        function setupEventListeners() {
+            document.getElementById('widthInput').addEventListener('input', debounce(handleWidthChange, 300));
+            document.getElementById('heightInput').addEventListener('input', debounce(handleHeightChange, 300));
+            
+            document.getElementById('qualityInput').addEventListener('input', (e) => {
+                document.getElementById('qualityValue').textContent = `${e.target.value}%`;
+                updatePreview();
+            });
+
+            document.getElementById('formatSelect').addEventListener('change', updatePreview);
+        }
+
+        function setupImageInput() {
+            document.getElementById('imageInput').addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+        }
+
+        async function handleFiles(files) {
+            const file = files[0];
+            if (await validateImage(file)) {
+                loadImage(file);
             }
         }
 
-        function updateQuality() {
-            const quality = document.getElementById('quality').value;
-            document.getElementById('quality-value').textContent = quality + '%';
+        async function validateImage(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('请选择有效的图片文件');
+                return false;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showError('图片大小不能超过10MB');
+                return false;
+            }
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => {
+                    showError('图片加载失败');
+                    resolve(false);
+                };
+                img.src = URL.createObjectURL(file);
+            });
         }
 
-        function compressImage() {
-            if (!currentImage) {
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = {
+                        width: img.width,
+                        height: img.height,
+                        aspectRatio: img.width / img.height,
+                        file: file
+                    };
+                    
+                    updateInputs();
+                    updatePreview();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateInputs() {
+            document.getElementById('widthInput').value = originalImage.width;
+            document.getElementById('heightInput').value = originalImage.height;
+        }
+
+        async function updatePreview() {
+            if (!originalImage.file) return;
+
+            const width = parseInt(document.getElementById('widthInput').value);
+            const height = parseInt(document.getElementById('heightInput').value);
+            const quality = parseInt(document.getElementById('qualityInput').value) / 100;
+            const format = document.getElementById('formatSelect').value;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            
+            const ctx = canvas.getContext('2d');
+            const img = await createImageBitmap(originalImage.file);
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL(format, quality);
+            document.getElementById('previewImage').src = dataUrl;
+
+            updateImageInfo(width, height, dataUrl);
+        }
+
+        function updateImageInfo(width, height, dataUrl) {
+            document.getElementById('dimensionsInfo').textContent = `${width} × ${height}`;
+            
+            const sizeInBytes = Math.round((dataUrl.length * 3) / 4);
+            const sizeInKB = Math.round(sizeInBytes / 1024);
+            document.getElementById('sizeInfo').textContent = `${sizeInKB} KB`;
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+
+        document.addEventListener('DOMContentLoaded', initImageTool);
+
+        function handleWidthChange(value) {
+            if (document.getElementById('maintainAspectRatio').checked) {
+                const height = Math.round(value / originalImage.aspectRatio);
+                document.getElementById('heightInput').value = height;
+            }
+            updatePreview();
+        }
+
+        function handleHeightChange(value) {
+            if (document.getElementById('maintainAspectRatio').checked) {
+                const width = Math.round(value * originalImage.aspectRatio);
+                document.getElementById('widthInput').value = width;
+            }
+            updatePreview();
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function preventDefault(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function downloadImage() {
+            const preview = document.getElementById('previewImage');
+            if (!preview.src) {
                 alert('请先选择图片！');
                 return;
             }
 
-            const quality = document.getElementById('quality').value / 100;
-            const img = new Image();
-            img.src = currentImage;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = document.getElementById('widthInput').value;
+            const height = document.getElementById('heightInput').value;
+            const quality = document.getElementById('qualityInput').value / 100;
+            const format = document.getElementById('formatSelect').value;
 
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
+            canvas.width = width;
+            canvas.height = height;
 
-                const compressed = canvas.toDataURL('image/jpeg', quality);
-                downloadImage(compressed, 'compressed.jpg');
-            }
-        }
+            ctx.drawImage(preview, 0, 0, width, height);
 
-        function convertToJPG() {
-            if (!currentImage) {
-                alert('请先选择图片！');
-                return;
-            }
-
-            const img = new Image();
-            img.src = currentImage;
-
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-
-                const jpg = canvas.toDataURL('image/jpeg');
-                downloadImage(jpg, 'converted.jpg');
-            }
-        }
-
-        function convertToPNG() {
-            if (!currentImage) {
-                alert('请先选择图片！');
-                return;
-            }
-
-            const img = new Image();
-            img.src = currentImage;
-
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-
-                const png = canvas.toDataURL('image/png');
-                downloadImage(png, 'converted.png');
-            }
-        }
-
-        function downloadImage(dataUrl, filename) {
             const link = document.createElement('a');
-            link.download = filename;
-            link.href = dataUrl;
+            link.download = 'processed-image.' + format.split('/')[1];
+            link.href = canvas.toDataURL(format, quality);
             link.click();
+        }
+
+        function resetAll() {
+            document.getElementById('widthInput').value = originalImage.width;
+            document.getElementById('heightInput').value = originalImage.height;
+            document.getElementById('qualityInput').value = 90;
+            document.getElementById('formatSelect').value = 'image/jpeg';
+            updatePreview();
         }
 
         function toggleTheme() {
@@ -299,15 +569,22 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            const themeButton = document.getElementById('themeToggle');
-            
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                themeButton.textContent = '☀️';
+        function showDonation() {
+            const modal = document.getElementById('donationModal');
+            modal.style.display = 'block';
+        }
+
+        function hideDonation() {
+            const modal = document.getElementById('donationModal');
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('donationModal');
+            if (event.target == modal) {
+                hideDonation();
             }
-        });
+        }
     </script>
 </body>
 </html> 
